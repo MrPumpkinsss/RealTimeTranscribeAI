@@ -1,6 +1,3 @@
-
----
-
 ```markdown
 # RealTimeTranscribeAI
 
@@ -68,5 +65,3 @@ Replace `"Your_Deepseek_API_Key"` with your actual Deepseek API key. You can als
    python main.py
    ```
 3. Once started, the graphical interface will display the live transcription and AI responses. Use the interface buttons to clear the transcript or adjust settings as needed.
-
----
