@@ -1,4 +1,3 @@
-Below is the updated **README.md** in English:
 
 ---
 
