@@ -1,4 +1,3 @@
-```markdown
 # RealTimeTranscribeAI
 
 RealTimeTranscribeAI is an enhanced version of the original [Ecoute](https://github.com/SevaSk/ecoute) project with an added AI reply feature. This tool simultaneously captures audio from your microphone (user input) and speakers (system output), transcribes it in real time, and uses the Deepseek API to generate professional AI responses.
