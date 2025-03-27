@@ -1,0 +1,8 @@
+numpy
+faster-whisper
+Wave
+openai
+customtkinter
+PyAudioWPatch
+torch>=2.2.0 --extra-index-url https://download.pytorch.org/whl/cu121 --no-cache-dir
+ctranslate2==3.24.0
