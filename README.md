@@ -41,7 +41,7 @@ RealTimeTranscribeAI is an enhanced version of the original [Ecoute](https://git
 Install the required Python packages using pip:
 
 ```bash
-pip install customtkinter faster-whisper torch openai python-dotenv
+pip install -r requirements.txt
 ```
 
 ### Deepseek API Configuration
