@@ -70,36 +70,60 @@ def clear_context(transcriber, speaker_queue, mic_queue):
 
 def generate_deepseek_response(transcriber, reply_textbox=None, speaker_queue=None, mic_queue=None):
     """
-    Fetches the current transcript from the transcriber, calls the Deepseek API
-    to generate a response, updates the reply textbox, and then clears the audio and transcript context.
+    使用流式传输获取Deepseek响应并实时更新界面
     """
     transcript = transcriber.get_transcript().strip()
     if not transcript:
         print("[INFO] Transcript is empty, unable to request Deepseek.")
         return
 
+    # 清空回复框内容
+    reply_textbox.delete("0.0", "end")
+    
     try:
-        response = client.chat.completions.create(
+        # 创建流式请求
+        stream = client.chat.completions.create(
             model=chat_model,
             messages=[
                 {"role": "system", "content": INITIAL_DEEPSEEK_PROMPT},
                 {"role": "user",   "content": transcript}
-            ]
+            ],
+            stream=True  # 启用流式传输
         )
-        answer = response.choices[0].message.content.strip()
-        print("[Deepseek] Model response:", answer)
 
-        if reply_textbox:
-            write_in_textbox(reply_textbox, answer)
+        collected_chunks = []
+        full_reply = ""
+
+        # 实时处理每个chunk
+        for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                chunk_content = chunk.choices[0].delta.content
+                
+                # 收集片段
+                collected_chunks.append(chunk_content)
+                full_reply += chunk_content
+                
+                # 立即更新界面
+                reply_textbox.insert("end", chunk_content)
+                reply_textbox.update_idletasks()  # 强制立即更新UI
+                reply_textbox.see("end")  # 自动滚动到底部
+
+        print("[Deepseek] Full response:", full_reply)
 
     except Exception as e:
-        print(f"[ERROR] An error occurred when calling Deepseek: {e}")
+        error_msg = f"[ERROR] Deepseek请求失败: {str(e)}"
+        print(error_msg)
+        reply_textbox.insert("end", "\n\n" + error_msg)
 
-    # Clear the context after generating a response
-    if speaker_queue and mic_queue:
-        clear_context(transcriber, speaker_queue, mic_queue)
-    else:
-        transcriber.clear_transcript_data()
+    # 最后清空上下文
+    def clear_after_delay():
+        if speaker_queue and mic_queue:
+            clear_context(transcriber, speaker_queue, mic_queue)
+        else:
+            transcriber.clear_transcript_data()
+    
+    # 延迟3秒后清空上下文（可根据需要调整）
+    threading.Timer(3, clear_after_delay).start()
 
 def create_ui_components(root, transcriber, speaker_queue, mic_queue):
     """
